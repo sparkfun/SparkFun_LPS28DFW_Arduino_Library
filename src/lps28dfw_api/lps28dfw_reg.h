@@ -491,10 +491,20 @@ int32_t lps28dfw_read_reg(stmdev_ctx_t *ctx, uint8_t reg,
 int32_t lps28dfw_write_reg(stmdev_ctx_t *ctx, uint8_t reg,
                            uint8_t *data, uint16_t len);
 
-extern float_t lps28dfw_from_fs1260_to_hPa(int32_t lsb);
-extern float_t lps28dfw_from_fs4000_to_hPa(int32_t lsb);
+/**
+ * SparkFun Change, October 2022
+ * 
+ * This API makes use of float_t, however some Arduino platforms (eg. Uno) don't
+ * have that type defined. Changing to float fixes compilation errors
+ */
+// extern float_t lps28dfw_from_fs1260_to_hPa(int32_t lsb);
+// extern float_t lps28dfw_from_fs4000_to_hPa(int32_t lsb);
 
-extern float_t lps28dfw_from_lsb_to_celsius(int16_t lsb);
+// extern float_t lps28dfw_from_lsb_to_celsius(int16_t lsb);
+extern float lps28dfw_from_fs1260_to_hPa(int32_t lsb);
+extern float lps28dfw_from_fs4000_to_hPa(int32_t lsb);
+
+extern float lps28dfw_from_lsb_to_celsius(int16_t lsb);
 
 typedef struct
 {
@@ -611,16 +621,24 @@ int32_t lps28dfw_mode_get(stmdev_ctx_t *ctx, lps28dfw_md_t *val);
 
 int32_t lps28dfw_trigger_sw(stmdev_ctx_t *ctx, lps28dfw_md_t *md);
 
+/**
+ * SparkFun Change, October 2022
+ * 
+ * This API makes use of float_t, however some Arduino platforms (eg. Uno) don't
+ * have that type defined. Changing to float fixes compilation errors
+ */
 typedef struct
 {
   struct
   {
-    float_t hpa;
+    // float_t hpa;
+    float hpa;
     int32_t raw; /* 32 bit signed-left algned  format left  */
   } pressure;
   struct
   {
-    float_t deg_c;
+    // float_t deg_c;
+    float deg_c;
     int16_t raw;
   } heat;
 } lps28dfw_data_t;
@@ -645,9 +663,16 @@ int32_t lps28dfw_fifo_mode_get(stmdev_ctx_t *ctx, lps28dfw_fifo_md_t *val);
 
 int32_t lps28dfw_fifo_level_get(stmdev_ctx_t *ctx, uint8_t *val);
 
+/**
+ * SparkFun Change, October 2022
+ * 
+ * This API makes use of float_t, however some Arduino platforms (eg. Uno) don't
+ * have that type defined. Changing to float fixes compilation errors
+ */
 typedef struct
 {
-  float_t hpa;
+  // float_t hpa;
+  float hpa;
   int32_t raw;
 } lps28dfw_fifo_data_t;
 int32_t lps28dfw_fifo_data_get(stmdev_ctx_t *ctx, uint8_t samp,

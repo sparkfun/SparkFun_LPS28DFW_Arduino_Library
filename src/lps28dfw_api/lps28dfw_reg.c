@@ -98,25 +98,45 @@ static void bytecpy(uint8_t *target, uint8_t *source)
   */
 
 /**
+ * SparkFun Change, October 2022
+ * 
+ * This API makes use of float_t, however some Arduino platforms (eg. Uno) don't
+ * have that type defined. Changing to float fixes compilation errors
+ */
+/**
   * @defgroup    Sensitivity
   * @brief       These functions convert raw-data into engineering units.
   * @{
   *
   */
 
-float_t lps28dfw_from_fs1260_to_hPa(int32_t lsb)
+// float_t lps28dfw_from_fs1260_to_hPa(int32_t lsb)
+// {
+//   return ((float_t)lsb / 1048576.0f);   /* 4096.0f * 256 */
+// }
+
+// float_t lps28dfw_from_fs4000_to_hPa(int32_t lsb)
+// {
+//   return ((float_t)lsb /  524288.0f);   /* 2048.0f * 256 */
+// }
+
+// float_t lps28dfw_from_lsb_to_celsius(int16_t lsb)
+// {
+//   return ((float_t)lsb / 100.0f);
+// }
+float lps28dfw_from_fs1260_to_hPa(int32_t lsb)
 {
-  return ((float_t)lsb / 1048576.0f);   /* 4096.0f * 256 */
+  return ((float)lsb / 1048576.0f);   /* 4096.0f * 256 */
 }
 
-float_t lps28dfw_from_fs4000_to_hPa(int32_t lsb)
+float lps28dfw_from_fs4000_to_hPa(int32_t lsb)
 {
-  return ((float_t)lsb /  524288.0f);   /* 2048.0f * 256 */
+  return ((float)lsb /  524288.0f);   /* 2048.0f * 256 */
 }
 
-float_t lps28dfw_from_lsb_to_celsius(int16_t lsb)
+float lps28dfw_from_lsb_to_celsius(int16_t lsb)
 {
-  return ((float_t)lsb / 100.0f);
+  return ((float)lsb / 100.0f);
 }
 
 /**
@@ -1045,7 +1065,13 @@ int32_t lps28dfw_int_on_threshold_mode_set(stmdev_ctx_t *ctx,
     bytecpy(&reg[1], (uint8_t *)&ths_p_l);
     bytecpy(&reg[2], (uint8_t *)&ths_p_h);
 
-    ret = lps28dfw_read_reg(ctx, LPS28DFW_INTERRUPT_CFG, reg, 3);
+    /**
+     * SparkFun Change, October 2022
+     * 
+     * This should be a write, not a read
+     */
+    // ret = lps28dfw_read_reg(ctx, LPS28DFW_INTERRUPT_CFG, reg, 3);
+    ret = lps28dfw_write_reg(ctx, LPS28DFW_INTERRUPT_CFG, reg, 3);
   }
   return ret;
 }
@@ -1117,8 +1143,15 @@ int32_t lps28dfw_reference_mode_set(stmdev_ctx_t *ctx, lps28dfw_ref_md_t *val)
 
     interrupt_cfg.reset_az  = ((uint8_t)val->apply_ref & 0x02U) >> 1;
     interrupt_cfg.reset_arp = ((uint8_t)val->apply_ref & 0x02U) >> 1;
-
-    ret = lps28dfw_read_reg(ctx, LPS28DFW_INTERRUPT_CFG,
+    
+    /**
+     * SparkFun Change, October 2022
+     * 
+     * This should be a write, not a read
+     */
+    // ret = lps28dfw_read_reg(ctx, LPS28DFW_INTERRUPT_CFG,
+    //                         (uint8_t *)&interrupt_cfg, 1);
+    ret = lps28dfw_write_reg(ctx, LPS28DFW_INTERRUPT_CFG,
                             (uint8_t *)&interrupt_cfg, 1);
   }
   return ret;

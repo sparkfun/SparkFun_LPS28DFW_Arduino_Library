@@ -1,65 +1,5 @@
 #include "SparkFun_LPS28DFW_Arduino_Library.h"
 
-// TODO - Delete once API is updated
-// This is a temporary fix due to a bug in lps28dfw_reference_mode_set(), where
-// the second read function needs to be a write. An issue has been submitted,
-// and this should be removed once the API is changed.
-static int32_t lps28dfw_reference_mode_set_temp(stmdev_ctx_t *ctx, lps28dfw_ref_md_t *val)
-{
-  lps28dfw_interrupt_cfg_t interrupt_cfg;
-  int32_t ret;
-
-  ret = lps28dfw_read_reg(ctx, LPS28DFW_INTERRUPT_CFG,
-                          (uint8_t *)&interrupt_cfg, 1);
-  if (ret == 0)
-  {
-
-    interrupt_cfg.autozero = val->get_ref;
-    interrupt_cfg.autorefp = (uint8_t)val->apply_ref & 0x01U;
-
-    interrupt_cfg.reset_az  = ((uint8_t)val->apply_ref & 0x02U) >> 1;
-    interrupt_cfg.reset_arp = ((uint8_t)val->apply_ref & 0x02U) >> 1;
-
-    ret = lps28dfw_write_reg(ctx, LPS28DFW_INTERRUPT_CFG,
-                            (uint8_t *)&interrupt_cfg, 1);
-  }
-  return ret;
-}
-
-// TODO - Delete once API is updated
-// This is a temporary fix due to a bug in lps28dfw_int_on_threshold_mode_set(),
-// where the second read function needs to be a write. An issue has been
-// submitted, and this should be removed once the API is changed.
-static int32_t lps28dfw_int_on_threshold_mode_set_temp(stmdev_ctx_t *ctx,
-                                           lps28dfw_int_th_md_t *val)
-{
-  lps28dfw_interrupt_cfg_t interrupt_cfg;
-  lps28dfw_ths_p_l_t ths_p_l;
-  lps28dfw_ths_p_h_t ths_p_h;
-  uint8_t reg[3];
-  int32_t ret;
-
-  ret = lps28dfw_read_reg(ctx, LPS28DFW_INTERRUPT_CFG, reg, 3);
-  if (ret == 0)
-  {
-    memcpy((uint8_t *)&interrupt_cfg, &reg[0], 1);
-    memcpy((uint8_t *)&ths_p_l, &reg[1], 1);
-    memcpy((uint8_t *)&ths_p_h, &reg[2], 1);
-
-    interrupt_cfg.phe = val->over_th;
-    interrupt_cfg.ple = val->under_th;
-    ths_p_h.ths = (uint8_t)(val->threshold / 256U);
-    ths_p_l.ths = (uint8_t)(val->threshold - (ths_p_h.ths * 256U));
-
-    memcpy(&reg[0], (uint8_t *)&interrupt_cfg, 1);
-    memcpy(&reg[1], (uint8_t *)&ths_p_l, 1);
-    memcpy(&reg[2], (uint8_t *)&ths_p_h, 1);
-
-    ret = lps28dfw_write_reg(ctx, LPS28DFW_INTERRUPT_CFG, reg, 3);
-  }
-  return ret;
-}
-
 /// @brief Default constructor
 LPS28DFW::LPS28DFW()
 {
@@ -308,11 +248,7 @@ int32_t LPS28DFW::flushFIFO()
 
 int32_t LPS28DFW::setReferenceMode(lps28dfw_ref_md_t* mode)
 {
-    // TODO - Change to lps28dfw_reference_mode_set() once API is updated
-    // This is a temporary fix due to a bug in lps28dfw_reference_mode_set(),
-    // where the second read function needs to be a write. An issue has been
-    // submitted, and this should be changed once the API is changed.
-    return lps28dfw_reference_mode_set_temp(&sensor, mode);
+    return lps28dfw_reference_mode_set(&sensor, mode);
 }
 
 int32_t LPS28DFW::setThresholdMode(lps28dfw_int_th_md_t* mode)
@@ -320,11 +256,7 @@ int32_t LPS28DFW::setThresholdMode(lps28dfw_int_th_md_t* mode)
     // Variable to track errors returned by API calls
     int32_t err = LPS28DFW_OK;
 
-    // TODO - Change to lps28dfw_int_on_threshold_mode_set() once API is updated
-    // This is a temporary fix due to a bug in lps28dfw_int_on_threshold_mode_set(),
-    // where the second read function needs to be a write. An issue has been
-    // submitted, and this should be changed once the API is changed.
-    err = lps28dfw_int_on_threshold_mode_set_temp(&sensor, mode);
+    err = lps28dfw_int_on_threshold_mode_set(&sensor, mode);
     if(err != LPS28DFW_OK)
     {
         return err;
