@@ -9,7 +9,7 @@ uint8_t i2cAddress = LPS28DFW_I2C_ADDRESS_DEFAULT; // 0x5C
 //uint8_t i2cAddress = LPS28DFW_I2C_ADDRESS_SECONDARY; // 0x5D
 
 // Pin used for interrupt detection
-int interruptPin = 5;
+int interruptPin = 2;
 
 // Flag to know when interrupts occur
 volatile bool interruptOccurred = false;
