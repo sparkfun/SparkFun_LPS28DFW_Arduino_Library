@@ -25,7 +25,7 @@ void setup()
 {
     // Start serial
     Serial.begin(115200);
-    Serial.println("LPS28DFW Example4 begin!");
+    Serial.println("LPS28DFW Example 4 - FIFO Buffer");
 
     // Initialize the I2C library
     Wire.begin();
@@ -43,9 +43,6 @@ void setup()
 
     Serial.println("LPS28DFW connected!");
 
-    // Variable to track errors returned by API calls
-    int32_t err = LPS28DFW_OK;
-
     // The LPS28DFW has multiple ODR (output data rate) settings available, from
     // 1Hz up to 200Hz. However it defaults to one-shot mode, where we have to
     // manually trigger measurements. For this example, we want the sensor to
@@ -58,13 +55,7 @@ void setup()
         .avg = LPS28DFW_4_AVG,      // Average filter
         .lpf = LPS28DFW_LPF_DISABLE // Low-pass filter
     };
-    err = pressureSensor.setModeConfig(&modeConfig);
-    if(err != LPS28DFW_OK)
-    {
-        // Mode config failed, most likely an invalid frequncy (code -2)
-        Serial.print("Mode config failed! Error code: ");
-        Serial.println(err);
-    }
+    pressureSensor.setModeConfig(&modeConfig);
     
     // Here we configure the FIFO buffer. including both the operation mode and
     // watermark level. The watermark can be set to a maximum of 127 samples.
@@ -92,13 +83,7 @@ void setup()
         .operation = LPS28DFW_STREAM,
         .watermark = numSamples
     };
-    err = pressureSensor.setFIFOConfig(&fifoConfig);
-    if(err != LPS28DFW_OK)
-    {
-        // Mode config failed, most likely an invalid frequncy (code -2)
-        Serial.print("Mode config failed! Error code: ");
-        Serial.println(err);
-    }
+    pressureSensor.setFIFOConfig(&fifoConfig);
 
     // Configure the LPS28DFW interrupt pin mode
     lps28dfw_int_mode_t intMode =
@@ -107,13 +92,7 @@ void setup()
         .active_low   = 0, // Signal polarity
         .drdy_latched = 0  // Latching mode (data ready condition only)
     };
-    err = pressureSensor.setInterruptMode(&intMode);
-    if(err != LPS28DFW_OK)
-    {
-        // Interrupt mode failed, most likely a communication error (code -2)
-        Serial.print("Interrupt mode failed! Error code: ");
-        Serial.println(err);
-    }
+    pressureSensor.setInterruptMode(&intMode);
 
     // Configure the LPS28DFW interrupt conditions
     lps28dfw_pin_int_route_t intRoute =
@@ -123,13 +102,7 @@ void setup()
         .fifo_ovr  = 0, // Trigger interrupts when FIFO overrun occurs
         .fifo_full = 0  // Trigger interrupts when FIFO is full
     };
-    err = pressureSensor.enableInterrupts(&intRoute);
-    if(err != LPS28DFW_OK)
-    {
-        // Interrupt enable failed, most likely a communication error (code -2)
-        Serial.print("Interrupt enable failed! Error code: ");
-        Serial.println(err);
-    }
+    pressureSensor.enableInterrupts(&intRoute);
 
     // Setup interrupt handler
     attachInterrupt(digitalPinToInterrupt(interruptPin), lps28dfwInterruptHandler, RISING);
@@ -137,22 +110,9 @@ void setup()
 
 void loop()
 {
-    // Variable to track errors returned by API calls
-    int32_t err = LPS28DFW_OK;
-
     // Get number of data samples currently stored in FIFO buffer
     uint8_t currentFIFOLength = 0;
-    err = pressureSensor.getFIFOLength(&currentFIFOLength);
-    if(err != LPS28DFW_OK)
-    {
-        // FIFO length failed, most likely a communication error (code -2)
-        Serial.print("FIFO length failed! Error code: ");
-        Serial.println(err);
-
-        // If getFIFOLength() failed this time, it will most likely fail next
-        // time. So let's wait a bit before trying again
-        delay(1000);
-    }
+    pressureSensor.getFIFOLength(&currentFIFOLength);
 
     // Check whether number of samples in FIFO buffer has changed
     if(previousFIFOLength != currentFIFOLength)
@@ -173,13 +133,7 @@ void loop()
         // so we'll just clear the FIFO buffer
         Serial.println("Too many samples in FIFO buffer, flushing...");
         
-        err = pressureSensor.flushFIFO();
-        if(err != LPS28DFW_OK)
-        {
-            // FIFO flush failed, most likely a communication error (code -2)
-            Serial.print("FIFO flush failed! Error code: ");
-            Serial.println(err);
-        }
+        pressureSensor.flushFIFO();
     }
 
     // Wait for interrupt to occur
@@ -192,27 +146,13 @@ void loop()
 
         // Get the interrupt status to know which condition triggered
         lps28dfw_all_sources_t interruptStatus;
-        err = pressureSensor.getInterruptStatus(&interruptStatus);
-        if(err != LPS28DFW_OK)
-        {
-            // Status get failed, most likely a communication error (code -2)
-            Serial.print("Get interrupt status failed! Error code: ");
-            Serial.println(err);
-            return;
-        }
+        pressureSensor.getInterruptStatus(&interruptStatus);
 
         // Check if this is the FIFO watermerk interrupt condition
         if(interruptStatus.fifo_th)
         {
             // Get FIFO data from the sensor
-            err = pressureSensor.getFIFOData(fifoData, numSamples);
-            if(err != LPS28DFW_OK)
-            {
-                // FIFO data get failed, most likely a communication error (code -2)
-                Serial.print("Get FIFO data failed! Error code: ");
-                Serial.println(err);
-                return;
-            }
+            pressureSensor.getFIFOData(fifoData, numSamples);
 
             // Print out all acquired data
             for(uint16_t i = 0; i < numSamples; i++)

@@ -10,7 +10,6 @@
 #define LPS28DFW_OK                 INT32_C(0)
 #define LPS28DFW_E_NOT_CONNECTED    INT32_C(-1)
 #define LPS28DFW_E_COM_FAIL         INT32_C(-2)
-#define LPS28DFW_E_INVALID_SETTING  INT32_C(-3)
 
 // Define I2C addresses. LPS28DFW_I2C_ADD_L/H are 8-bit values, need 7-bit
 #define LPS28DFW_I2C_ADDRESS_DEFAULT (LPS28DFW_I2C_ADD_L >> 1)   // 0x5C
@@ -88,7 +87,7 @@ class LPS28DFW
         int32_t getStatus(lps28dfw_stat_t* status);
 
         // Data acquisistion
-        int32_t getSensorData(lps28dfw_data_t* data);
+        int32_t getSensorData();
 
         // Interrupt control
         int32_t setInterruptMode(lps28dfw_int_mode_t* intMode);
@@ -106,6 +105,9 @@ class LPS28DFW
         int32_t setReferenceMode(lps28dfw_ref_md_t* mode);
         int32_t setThresholdMode(lps28dfw_int_th_md_t* mode);
         // int32_t getReferencePressure(lps28dfw_ref_md_t* mode);
+        
+        // Latest measurement from the sensor
+        lps28dfw_data_t data;
 
     private:
         // Read/write helper functions

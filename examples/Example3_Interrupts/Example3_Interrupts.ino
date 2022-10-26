@@ -18,7 +18,7 @@ void setup()
 {
     // Start serial
     Serial.begin(115200);
-    Serial.println("LPS28DFW Example3 begin!");
+    Serial.println("LPS28DFW Example 3 - Interrupts");
 
     // Initialize the I2C library
     Wire.begin();
@@ -36,9 +36,6 @@ void setup()
 
     Serial.println("LPS28DFW connected!");
 
-    // Variable to track errors returned by API calls
-    int32_t err = LPS28DFW_OK;
-
     // The LPS28DFW has multiple ODR (output data rate) settings available, from
     // 1Hz up to 200Hz. However it defaults to one-shot mode, where we have to
     // manually trigger measurements. For this example, we want the sensor to
@@ -51,13 +48,7 @@ void setup()
         .avg = LPS28DFW_4_AVG,      // Average filter
         .lpf = LPS28DFW_LPF_DISABLE // Low-pass filter
     };
-    err = pressureSensor.setModeConfig(&modeConfig);
-    if(err != LPS28DFW_OK)
-    {
-        // Mode config failed, most likely an invalid frequncy (code -2)
-        Serial.print("Mode config failed! Error code: ");
-        Serial.println(err);
-    }
+    pressureSensor.setModeConfig(&modeConfig);
 
     // Configure the LPS28DFW interrupt pin mode
     lps28dfw_int_mode_t intMode =
@@ -66,13 +57,7 @@ void setup()
         .active_low   = 1, // Signal polarity
         .drdy_latched = 0  // Latching mode (data ready condition only)
     };
-    err = pressureSensor.setInterruptMode(&intMode);
-    if(err != LPS28DFW_OK)
-    {
-        // Interrupt mode failed, most likely a communication error (code -2)
-        Serial.print("Interrupt mode failed! Error code: ");
-        Serial.println(err);
-    }
+    pressureSensor.setInterruptMode(&intMode);
 
     // Configure the LPS28DFW to trigger interrupts when measurements finish
     lps28dfw_pin_int_route_t intRoute =
@@ -82,13 +67,7 @@ void setup()
         .fifo_ovr  = 0, // Trigger interrupts when FIFO overrun occurs
         .fifo_full = 0  // Trigger interrupts when FIFO is full
     };
-    err = pressureSensor.enableInterrupts(&intRoute);
-    if(err != LPS28DFW_OK)
-    {
-        // Interrupt enable failed, most likely a communication error (code -2)
-        Serial.print("Interrupt enable failed! Error code: ");
-        Serial.println(err);
-    }
+    pressureSensor.enableInterrupts(&intRoute);
 
     // Setup interrupt handler
     attachInterrupt(digitalPinToInterrupt(interruptPin), lps28dfwInterruptHandler, RISING);
@@ -104,43 +83,23 @@ void loop()
 
         Serial.print("Interrupt occurred!\t\t");
 
-        // Variable to track errors returned by API calls
-        int8_t err = LPS28DFW_OK;
-
         // Get the interrupt status to know which condition triggered
         lps28dfw_all_sources_t interruptStatus;
-        err = pressureSensor.getInterruptStatus(&interruptStatus);
-        if(err != LPS28DFW_OK)
-        {
-            // Status get failed, most likely a communication error (code -2)
-            Serial.print("Get interrupt status failed! Error code: ");
-            Serial.println(err);
-            return;
-        }
+        pressureSensor.getInterruptStatus(&interruptStatus);
 
         // Check if this is the "data ready" interrupt condition
         if(interruptStatus.drdy_pres & interruptStatus.drdy_temp)
         {
-            // Get measurements from the sensor
-            lps28dfw_data_t data;
-            err = pressureSensor.getSensorData(&data);
+            // Get measurements from the sensor. This must be called before
+            // accessing the pressure data, otherwise it will never update
+            pressureSensor.getSensorData();
 
-            // Check whether data was acquired successfully
-            if(err == LPS28DFW_OK)
-            {
-                // Acquisistion succeeded, print temperature and pressure
-                Serial.print("Temperature (C): ");
-                Serial.print(data.heat.deg_c);
-                Serial.print("\t\t");
-                Serial.print("Pressure (hPa): ");
-                Serial.println(data.pressure.hpa);
-            }
-            else
-            {
-                // Acquisition failed, most likely a communication error (code -2)
-                Serial.print("Error getting data from sensor! Error code: ");
-                Serial.println(err);
-            }
+            // Print temperature and pressure
+            Serial.print("Temperature (C): ");
+            Serial.print(pressureSensor.data.heat.deg_c);
+            Serial.print("\t\t");
+            Serial.print("Pressure (hPa): ");
+            Serial.println(pressureSensor.data.pressure.hpa);
         }
         else
         {

@@ -12,7 +12,7 @@ void setup()
 {
     // Start serial
     Serial.begin(115200);
-    Serial.println("LPS28DFW Example2 begin!");
+    Serial.println("LPS28DFW Example 2 - Filtering");
 
     // Initialize the I2C library
     Wire.begin();
@@ -29,9 +29,6 @@ void setup()
     }
 
     Serial.println("LPS28DFW connected!");
-
-    // Variable to track errors returned by API calls
-    int32_t err = LPS28DFW_OK;
 
     // Here we configure the sensor to have minimal measurement noise. There are
     // 4 parameters that we can control:
@@ -60,37 +57,21 @@ void setup()
         .avg = LPS28DFW_512_AVG,      // Average filter
         .lpf = LPS28DFW_LPF_ODR_DIV_9 // Low-pass filter
     };
-    err = pressureSensor.setModeConfig(&modeConfig);
-    if(err != LPS28DFW_OK)
-    {
-        // Mode config failed, most likely an invalid frequncy (code -2)
-        Serial.print("Mode config failed! Error code: ");
-        Serial.println(err);
-    }
+    pressureSensor.setModeConfig(&modeConfig);
 }
 
 void loop()
 {
-    // Get measurements from the sensor
-    lps28dfw_data_t data;
-    int8_t err = pressureSensor.getSensorData(&data);
+    // Get measurements from the sensor. This must be called before accessing
+    // the pressure data, otherwise it will never update
+    pressureSensor.getSensorData();
 
-    // Check whether data was acquired successfully
-    if(err == LPS28DFW_OK)
-    {
-        // Acquisistion succeeded, print temperature and pressure
-        Serial.print("Temperature (C): ");
-        Serial.print(data.heat.deg_c);
-        Serial.print("\t\t");
-        Serial.print("Pressure (hPa): ");
-        Serial.println(data.pressure.hpa);
-    }
-    else
-    {
-        // Acquisition failed, most likely a communication error (code -2)
-        Serial.print("Error getting data from sensor! Error code: ");
-        Serial.println(err);
-    }
+    // Print temperature and pressure
+    Serial.print("Temperature (C): ");
+    Serial.print(pressureSensor.data.heat.deg_c);
+    Serial.print("\t\t");
+    Serial.print("Pressure (hPa): ");
+    Serial.println(pressureSensor.data.pressure.hpa);
 
     // Print at 25Hz
     delay(40);

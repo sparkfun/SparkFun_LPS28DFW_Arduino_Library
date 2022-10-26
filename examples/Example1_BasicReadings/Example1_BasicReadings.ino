@@ -12,7 +12,7 @@ void setup()
 {
     // Start serial
     Serial.begin(115200);
-    Serial.println("LPS28DFW Example1 begin!");
+    Serial.println("LPS28DFW Example 1 - Basic Readings!");
 
     // Initialize the I2C library
     Wire.begin();
@@ -33,26 +33,16 @@ void setup()
 
 void loop()
 {
-    // Get measurements from the sensor
-    lps28dfw_data_t data;
-    int8_t err = pressureSensor.getSensorData(&data);
+    // Get measurements from the sensor. This must be called before accessing
+    // the pressure data, otherwise it will never update
+    pressureSensor.getSensorData();
 
-    // Check whether data was acquired successfully
-    if(err == LPS28DFW_OK)
-    {
-        // Acquisistion succeeded, print temperature and pressure
-        Serial.print("Temperature (C): ");
-        Serial.print(data.heat.deg_c);
-        Serial.print("\t\t");
-        Serial.print("Pressure (hPa): ");
-        Serial.println(data.pressure.hpa);
-    }
-    else
-    {
-        // Acquisition failed, most likely a communication error (code -2)
-        Serial.print("Error getting data from sensor! Error code: ");
-        Serial.println(err);
-    }
+    // Print temperature and pressure
+    Serial.print("Temperature (C): ");
+    Serial.print(pressureSensor.data.heat.deg_c);
+    Serial.print("\t\t");
+    Serial.print("Pressure (hPa): ");
+    Serial.println(pressureSensor.data.pressure.hpa);
 
     // Only print every second
     delay(1000);
