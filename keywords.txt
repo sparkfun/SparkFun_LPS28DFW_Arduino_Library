@@ -1,0 +1,101 @@
+#########################################################
+# Syntax Coloring Map for SparkFun BMA400               #
+#########################################################
+# Class
+#########################################################
+
+LPS28DFW	KEYWORD1
+
+#########################################################
+# Methods and Functions
+#########################################################
+
+begin 	KEYWORD2
+init 	KEYWORD2
+boot 	KEYWORD2
+reset 	KEYWORD2
+setModeConfig 	KEYWORD2
+getModeConfig 	KEYWORD2
+getStatus 	KEYWORD2
+getSensorData 	KEYWORD2
+setInterruptMode 	KEYWORD2
+enableInterrupts 	KEYWORD2
+getInterruptStatus 	KEYWORD2
+setFIFOConfig 	KEYWORD2
+getFIFOConfig 	KEYWORD2
+getFIFOLength 	KEYWORD2
+getFIFOData 	KEYWORD2
+flushFIFO 	KEYWORD2
+setReferenceMode 	KEYWORD2
+setThresholdMode 	KEYWORD2
+getReferencePressure 	KEYWORD2
+readRegisters 	KEYWORD2
+writeRegisters 	KEYWORD2
+msDelay 	KEYWORD2
+
+#########################################################
+# Constants
+#########################################################
+
+LPS28DFW_OK  LITERAL1
+LPS28DFW_E_NOT_CONNECTED  LITERAL1
+LPS28DFW_E_COM_FAIL  LITERAL1
+LPS28DFW_I2C_ADDRESS_DEFAULT  LITERAL1
+LPS28DFW_I2C_ADDRESS_SECONDARY  LITERAL1
+LPS28DFW_SEL_BY_HW  LITERAL1
+LPS28DFW_INT_PIN_ON_I3C  LITERAL1
+LPS28DFW_AUTO  LITERAL1
+LPS28DFW_ALWAYS_ON  LITERAL1
+LPS28DFW_BUS_AVB_TIME_50us  LITERAL1
+LPS28DFW_BUS_AVB_TIME_2us  LITERAL1
+LPS28DFW_BUS_AVB_TIME_1ms  LITERAL1
+LPS28DFW_BUS_AVB_TIME_25ms  LITERAL1
+LPS28DFW_DRV_RDY  LITERAL1
+LPS28DFW_BOOT  LITERAL1
+LPS28DFW_RESET  LITERAL1
+LPS28DFW_1260hPa  LITERAL1
+LPS28DFW_4000hPa  LITERAL1
+LPS28DFW_ONE_SHOT  LITERAL1
+LPS28DFW_1Hz  LITERAL1
+LPS28DFW_4Hz  LITERAL1
+LPS28DFW_10Hz  LITERAL1
+LPS28DFW_25Hz  LITERAL1
+LPS28DFW_50Hz  LITERAL1
+LPS28DFW_75Hz  LITERAL1
+LPS28DFW_100Hz  LITERAL1
+LPS28DFW_200Hz  LITERAL1
+LPS28DFW_4_AVG  LITERAL1
+LPS28DFW_8_AVG  LITERAL1
+LPS28DFW_16_AVG  LITERAL1
+LPS28DFW_32_AVG  LITERAL1
+LPS28DFW_64_AVG  LITERAL1
+LPS28DFW_128_AVG  LITERAL1
+LPS28DFW_256_AVG  LITERAL1
+LPS28DFW_512_AVG  LITERAL1
+LPS28DFW_LPF_DISABLE  LITERAL1
+LPS28DFW_LPF_ODR_DIV_4  LITERAL1
+LPS28DFW_LPF_ODR_DIV_9  LITERAL1
+LPS28DFW_BYPASS  LITERAL1
+LPS28DFW_FIFO  LITERAL1
+LPS28DFW_STREAM  LITERAL1
+LPS28DFW_STREAM_TO_FIFO  LITERAL1
+LPS28DFW_BYPASS_TO_STREAM  LITERAL1
+LPS28DFW_BYPASS_TO_FIFO  LITERAL1
+LPS28DFW_OUT_AND_INTERRUPT  LITERAL1
+LPS28DFW_ONLY_INTERRUPT  LITERAL1
+LPS28DFW_RST_REFS  LITERAL1
+
+#########################################################
+# Structs
+#########################################################
+
+LPS28DFW_InterfaceData  LITERAL3
+lps28dfw_md_t   LITERAL3
+lps28dfw_stat_t LITERAL3
+lps28dfw_int_mode_t LITERAL3
+lps28dfw_pin_int_route_t    LITERAL3
+lps28dfw_all_sources_t  LITERAL3
+lps28dfw_fifo_md_t  LITERAL3
+lps28dfw_fifo_data_t    LITERAL3
+lps28dfw_ref_md_t   LITERAL3
+lps28dfw_int_th_md_t    LITERAL3
