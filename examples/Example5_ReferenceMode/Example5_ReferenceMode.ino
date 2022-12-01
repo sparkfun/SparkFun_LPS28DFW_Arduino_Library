@@ -36,6 +36,10 @@ void setup()
 
     Serial.println("LPS28DFW connected!");
 
+    // We'll wait here for the user to set the reference pressure
+    Serial.println("Enter any key to store the current pressure as the reference pressure");
+    while(Serial.available() == 0) {}
+
     // The LPS28DFW has multiple ODR (output data rate) settings available, from
     // 1Hz up to 200Hz. However it defaults to one-shot mode, where we have to
     // manually trigger measurements. For this example, we want the sensor to
@@ -51,18 +55,44 @@ void setup()
     };
     pressureSensor.setModeConfig(&modeConfig);
 
-    // Here we set the reference pressure 
+    // Here we make the sensor store the latest measurement as the reference
+    // pressure, and all future measurements will have that pressure subtracted.
+    // The .apply_ref can have the following values:
+    // LPS28DFW_OUT_AND_INTERRUPT - Use reference pressure for measurements and threshold interrupts
+    // LPS28DFW_ONLY_INTERRUPT    - Use reference pressure for threshold interrupts only
+    // LPS28DFW_RST_REFS          - Reset reference pressure
+    // The .get_ref is used to actually store the reference pressure
     lps28dfw_ref_md_t refConfig =
     {
         .apply_ref = LPS28DFW_OUT_AND_INTERRUPT,
-        .get_ref = 1
+        .get_ref = true
     };
     pressureSensor.setReferenceMode(&refConfig);
+
+    // Now we can read the reference pressure that was just stored. The
+    // getReferencePressure() will return the raw value store by the sensor,
+    // which is either hPa*16 or hPa*8 if the full scale range is 1260hPa or
+    // 4000hPa respectively
+    int16_t refPressureRaw = 0;
+    pressureSensor.getReferencePressure(&refPressureRaw);
+    float refPressureHPa = refPressureRaw / 16.0; // Divide by 16 in 1260hPa range
+
+    // Let's print out the reference pressure for the user, and wait a few
+    // seconds so they can read it
+    Serial.print("Reference pressure (hPa): ");
+    Serial.println(refPressureHPa);
+    Serial.print("Beginning in 3... ");
+    delay(1000);
+    Serial.print("2... ");
+    delay(1000);
+    Serial.print("1... ");
+    delay(1000);
+    Serial.println("Go!");
 
     // Configure the LPS28DFW to trigger interrupts when the measured pressure
     // exceeds some threshold relative to the reference pressure. The threshold
     // is equal to the pressure in hPa*16 or hPa*8 when the full scale range is
-    // 1260hPa or 4000hPa respectively.
+    // 1260hPa or 4000hPa respectively
     lps28dfw_int_th_md_t thresholdMode =
     {
         .threshold = 16, // Threshold above/below the reference pressure

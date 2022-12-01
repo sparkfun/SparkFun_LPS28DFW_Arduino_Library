@@ -104,7 +104,7 @@ class LPS28DFW
         // Reference mode control
         int32_t setReferenceMode(lps28dfw_ref_md_t* mode);
         int32_t setThresholdMode(lps28dfw_int_th_md_t* mode);
-        // int32_t getReferencePressure(lps28dfw_ref_md_t* mode);
+        int32_t getReferencePressure(int16_t* pressRaw);
         
         // Latest measurement from the sensor
         lps28dfw_data_t data;

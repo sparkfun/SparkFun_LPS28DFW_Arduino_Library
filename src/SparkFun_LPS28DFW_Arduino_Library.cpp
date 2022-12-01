@@ -246,11 +246,18 @@ int32_t LPS28DFW::flushFIFO()
     return lps28dfw_fifo_mode_set(&sensor, &oldConfig);
 }
 
+/// @brief Sets reference mode, where measurements are relative to a reference
+// pressure. If mode.get_ref is 1, this updates the reference pressure
+/// @param mode Reference mode struct, see lps28dfw_ref_md_t
+/// @return Error code. 0 means success, negative means failure
 int32_t LPS28DFW::setReferenceMode(lps28dfw_ref_md_t* mode)
 {
     return lps28dfw_reference_mode_set(&sensor, mode);
 }
 
+/// @brief Sets threshold interrupt, setReferenceMode() must be called first
+/// @param mode Threshold interrupt mode, see lps28dfw_int_th_md_t
+/// @return Error code. 0 means success, negative means failure
 int32_t LPS28DFW::setThresholdMode(lps28dfw_int_th_md_t* mode)
 {
     // Variable to track errors returned by API calls
@@ -280,6 +287,15 @@ int32_t LPS28DFW::setThresholdMode(lps28dfw_int_th_md_t* mode)
     return lps28dfw_write_reg(&sensor, LPS28DFW_CTRL_REG4, reg, 1);
 
     // return LPS28DFW_OK;
+}
+
+/// @brief Gets the current reference pressure after calling setReferenceMode()
+/// @param pressRaw Raw pressure value. Can convert to hPa by dividing by either
+// 16 or 8 if the full scale range is 1260hPa or 4000hPa respectively
+/// @return Error code. 0 means success, negative means failure
+int32_t LPS28DFW::getReferencePressure(int16_t* pressRaw)
+{
+    return lps28dfw_refp_get(&sensor, pressRaw);
 }
 
 /// @brief Helper function to read sensor registers over I2C
