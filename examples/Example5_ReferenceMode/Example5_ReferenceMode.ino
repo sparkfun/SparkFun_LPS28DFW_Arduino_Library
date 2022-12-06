@@ -95,18 +95,18 @@ void setup()
     // 1260hPa or 4000hPa respectively
     lps28dfw_int_th_md_t thresholdMode =
     {
-        .threshold = 16, // Threshold above/below the reference pressure
-        .over_th = 1,    // Enable the "over pressure" interrupt condition
-        .under_th = 1    // Enable the "under pressure" interrupt condition
+        .threshold = 16, // Threshold above/below the reference pressure (eg. 16 = 1hPa in 1260hPa range)
+        .over_th = true, // Enable the "over pressure" interrupt condition
+        .under_th = true // Enable the "under pressure" interrupt condition
     };
     pressureSensor.setThresholdMode(&thresholdMode);
 
     // Configure the LPS28DFW interrupt pin mode
     lps28dfw_int_mode_t intMode =
     {
-        .int_latched  = 0, // Latching mode (not including data ready condition)
-        .active_low   = 0, // Signal polarity
-        .drdy_latched = 0  // Latching mode (data ready condition only)
+        .int_latched  = false, // Latching mode (not including data ready condition)
+        .active_low   = false, // Signal polarity
+        .drdy_latched = false  // Latching mode (data ready condition only)
     };
     pressureSensor.setInterruptMode(&intMode);
 
